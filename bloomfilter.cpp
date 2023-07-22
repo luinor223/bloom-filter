@@ -23,7 +23,7 @@ long long hashString(string s, int BASE) // Polynomial rolling hash
 {
     long long hash = 0;
     for (int i = 0; i < s.size(); i++)
-        hash = (hash * BASE + (s[i] + 1)) % MOD;
+        hash = (hash * BASE + (s[i] - ' ' + 1)) % MOD;
 
     return hash;
 }
