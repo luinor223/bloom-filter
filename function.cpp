@@ -205,7 +205,6 @@ bool logIn(Account acc, vector<Account> accs, BloomFilter bf)
         cout << "Username does not exist." << endl;
         return false;
     }
-    cout << "Check2";
 
     //If there is a chance that the username exist, (linear) search the database
     for (int i = 0; i < accs.size(); i++)
