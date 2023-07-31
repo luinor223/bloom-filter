@@ -26,8 +26,13 @@ bool isValidPassword(string password)
     return hasUpper && hasLower && hasDigit && hasSpecial;
 }
 
-bool isWeakPassword(string password, string weakPass_file)
+bool isWeakPassword(BloomFilter wpassbf, string password, string weakPass_file)
 {
+    //Look for weak password in bloom filter first
+    if (!isInBF(password, wpassbf))
+        return false;
+
+    //If the weak password is found in the bloom filter, check in the file
     ifstream weakPassFile(weakPass_file);
     if (!weakPassFile)
     {
@@ -70,18 +75,37 @@ vector<Account> getDatabase(string account_file)
     return accs;
 }
 
-BloomFilter generateBloomFilter(vector<Account> accs)
+BloomFilter generateUsernameFilter(vector<Account> accs)
 {
     BloomFilter bf;
     int start_prime = 31;
     GenerateFuncCoefficient(bf, start_prime);
     for (int i = 0; i < accs.size(); i++)
-        add(accs[i].username, bf);
+        addToBF(accs[i].username, bf);
     
     return bf;
 }
 
-bool registerAccount(Account account, vector<Account> &accs , string account_file, string weakPass_file, BloomFilter bf)
+BloomFilter generateWPassFilter(string weakPass_file)
+{
+    BloomFilter bf;
+    int start_prime = 31;
+    GenerateFuncCoefficient(bf, start_prime);
+    ifstream ifs(weakPass_file);
+    if (!ifs)
+    {
+        cout << "Unable to open " << weakPass_file << endl;
+        return bf;
+    }
+    string line;
+    while (getline(ifs, line))
+        addToBF(line, bf);
+    ifs.close();
+
+    return bf;
+}
+
+bool registerAccount(Account account, vector<Account> &accs , string account_file, string weakPass_file, BloomFilter accbf, BloomFilter wpassbf)
 {
     // Check username and password constraints
     if (account.username.length() <= 5 || account.username.length() >= 10)
@@ -120,14 +144,14 @@ bool registerAccount(Account account, vector<Account> &accs , string account_fil
         return false;
     }
 
-    if (isWeakPassword(account.password, weakPass_file))
+    if (isWeakPassword(wpassbf, account.password, weakPass_file))
     {
         cout << "Password is too weak.\n";
         return false;
     }
 
     // Check if the username is not the same as any registered usernames
-    if (lookUp(account.username, bf))   //First, check if the username exist in bloom filter
+    if (isInBF(account.username, accbf))   //First, check if the username exist in bloom filter
     {   //If yes, the username probably exists in the database. Linear search the database
         for (int i = 0; i < accs.size(); i++)
         {
@@ -150,12 +174,12 @@ bool registerAccount(Account account, vector<Account> &accs , string account_fil
     ofs.close();
 
     //Update bloom filter
-    add(account.username, bf);
+    addToBF(account.username, accbf);
 
     return true;
 }
 
-bool multiplyRegistration(vector<Account> &accs, string signup_file, string account_file, string fail_file, string weakPass_file , BloomFilter bf)
+bool multiplyRegistration(vector<Account> &accs, string signup_file, string account_file, string fail_file, string weakPass_file , BloomFilter accbf, BloomFilter wpassbf)
 {
     ifstream ifs(signup_file);
     if (!ifs)
@@ -176,8 +200,10 @@ bool multiplyRegistration(vector<Account> &accs, string signup_file, string acco
         stringstream ss {line};
         ss >> temp.username;
         ss >> temp.password;
-        if (!registerAccount(temp, accs , account_file, weakPass_file, bf)) //If the registration fails, output the account to fail.txt
+        if (!registerAccount(temp, accs , account_file, weakPass_file, accbf, wpassbf)) //If the registration fails, output the account to fail.txt
             ofs << temp.username << " " << temp.password << endl;
+        else
+            cout << "Account " << temp.username << " successfully registered." << endl;
     }
     ifs.close();
     ofs.close();
@@ -200,7 +226,7 @@ bool logIn(Account acc, vector<Account> accs, BloomFilter bf)
     }
     
     //Look the username up in the bloom filter
-    if (!lookUp(acc.username, bf))  //If it doesn't exist in bf, it 100% doesn't exist in database
+    if (!isInBF(acc.username, bf))  //If it doesn't exist in bf, it 100% doesn't exist in database
     {
         cout << "Username does not exist." << endl;
         return false;
@@ -229,7 +255,7 @@ bool logIn(Account acc, vector<Account> accs, BloomFilter bf)
     return false;
 }
 
-bool changePassword(Account &acc, vector<Account> &accs , string newpassword , string account_file, string weakPass_file)
+bool changePassword(Account &acc, vector<Account> &accs , string newpassword , string account_file, string weakPass_file, BloomFilter wpassbf)
 {
     if (newpassword.length() <= 10 || newpassword.length() >= 20)
     {
@@ -261,7 +287,7 @@ bool changePassword(Account &acc, vector<Account> &accs , string newpassword , s
         return false;
     }
 
-    if (isWeakPassword(newpassword, weakPass_file))
+    if (isWeakPassword(wpassbf, newpassword, weakPass_file))
     {
         cout << "Password is too weak." << endl;
         return false;

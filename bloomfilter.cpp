@@ -15,11 +15,12 @@ const int BitArraySize = -(DatabaseSize * log(P)) / (log(2) * log(2));
 struct BloomFilter
 {
     bitset<BitArraySize> filter;
-    const int FuncNum = (BitArraySize * 1.0 / DatabaseSize) * log(2);
-    int* FuncCoef;
+    const int NumberOfHashing = (BitArraySize * 1.0 / DatabaseSize) * log(2);
+    int* FuncCoef; //The base values for hash calculation
 };
 
-long long hashString(string s, int BASE) // Polynomial rolling hash
+//Calculates the hash value of a given string using the polynomial rolling hash algorithm.
+long long hashString(string s, int BASE)
 {
     long long hash = 0;
     for (int i = 0; i < s.size(); i++)
@@ -40,12 +41,13 @@ bool isPrime(int num)
     return true;
 }
 
+//Generate BASE numbers for Polynomial Rolling Hash
 void GenerateFuncCoefficient(BloomFilter &bf, int start)
 { // get prime numbers, good for polynomial rolling hash
-    bf.FuncCoef = new int[bf.FuncNum];
+    bf.FuncCoef = new int[bf.NumberOfHashing];
     int num = start;
     int count = 0;
-    while (count < bf.FuncNum)
+    while (count < bf.NumberOfHashing)
     {
         if (isPrime(num))
             bf.FuncCoef[count++] = num;
@@ -53,20 +55,21 @@ void GenerateFuncCoefficient(BloomFilter &bf, int start)
     }
 }
 
-// Time Complexity: O(d*FuncNum) where d is the length of string s
-void add(string s, BloomFilter &bf)
+// Time Complexity: O(d*NumberOfHashing) where d is the length of string s
+//Add a string to the bloom filter
+void addToBF(string s, BloomFilter &bf)
 {
-    for (int i = 0; i < bf.FuncNum; i++)
+    for (int i = 0; i < bf.NumberOfHashing; i++)
     {
         int index = hashString(s, bf.FuncCoef[i]) % BitArraySize;
-        bf.filter[index] = 1;
-        // cout << "flipped the "<< index << "th bit" << endl;
+        bf.filter[index] = 1;   // Turn on the bit at index
     }
 }
-// Time Complexity: O(d*FuncNum) where d is the length of string s
-bool lookUp(string s, BloomFilter bf)
+// Time Complexity: O(d*NumberOfHashing) where d is the length of string s
+// Check if a string is in the bloom filter
+bool isInBF(string s, BloomFilter bf)
 {
-    for (int i = 0; i < bf.FuncNum; i++)
+    for (int i = 0; i < bf.NumberOfHashing; i++)
     {
         int index = hashString(s, bf.FuncCoef[i]) % BitArraySize;
         if (bf.filter[index] == 0)

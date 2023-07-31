@@ -2,12 +2,13 @@
 
 int main()
 {
-    string account_file = "Account.txt";
-    string weakpass_file = "WeakPass.txt";
-    string signup_file = "SignUp.txt";
-    string fail_file = "Fail.txt";
+    const string account_file = "Account.txt";
+    const string weakpass_file = "WeakPass.txt";
+    const string signup_file = "SignUp.txt";
+    const string fail_file = "Fail.txt";
     vector<Account> accs = getDatabase(account_file);
-    BloomFilter bf = generateBloomFilter(accs);
+    BloomFilter accbf = generateUsernameFilter(accs);
+    BloomFilter wpassbf = generateWPassFilter(weakpass_file);
     bool menu = true;
     Account acc;
     bool loggedIn = false;
@@ -32,7 +33,7 @@ int main()
                     getline(cin, acc.username);
                     cout << "Enter password: ";
                     getline(cin, acc.password);
-                    if (registerAccount(acc, accs, account_file, weakpass_file, bf))
+                    if (registerAccount(acc, accs, account_file, weakpass_file, accbf, wpassbf))
                         cout << "Registration succesful." << endl;
                     else
                         cout << "Registration failed" << endl;
@@ -42,7 +43,7 @@ int main()
                     break;
                 case 2:
                     cout << "---Multiple Registrations---" << endl;
-                    multiplyRegistration(accs, signup_file, account_file, fail_file, weakpass_file, bf);
+                    multiplyRegistration(accs, signup_file, account_file, fail_file, weakpass_file, accbf, wpassbf);
                     cout << "Done." << endl << endl;
                     break;
                 case 3:
@@ -51,7 +52,7 @@ int main()
                     getline(cin, acc.username);
                     cout << "Enter passowrd: ";
                     getline(cin, acc.password);
-                    if (logIn(acc, accs, bf))
+                    if (logIn(acc, accs, accbf))
                     {
                         loggedIn = true;
                         cout << "Login Successful." << endl;
@@ -88,7 +89,7 @@ int main()
                 case 1:
                     cout << "Enter your new password: ";
                     getline(cin, newpassword);
-                    if (changePassword(acc, accs, newpassword, account_file, weakpass_file))
+                    if (changePassword(acc, accs, newpassword, account_file, weakpass_file, wpassbf))
                         cout << "Password changed successfully." << endl;
                     else
                         cout << "Failed to change password." << endl;
@@ -111,6 +112,6 @@ int main()
         }
     }
 
-    delete[] bf.FuncCoef;
+    delete[] accbf.FuncCoef;
     return 0;
 }
