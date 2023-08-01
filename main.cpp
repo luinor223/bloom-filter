@@ -14,7 +14,7 @@ int main()
     bool loggedIn = false;
     while (menu)
     {
-        int choice;
+        char choice;
         if (!loggedIn)
         {
             cout << "==== Account Management System ====" << endl;
@@ -27,7 +27,7 @@ int main()
             cin.ignore();
             switch (choice)
             {
-                case 1:
+                case '1':
                     cout << "---Register---" << endl;
                     cout << "Enter username: ";
                     getline(cin, acc.username);
@@ -41,12 +41,12 @@ int main()
                     acc.username = "";
                     acc.password = "";
                     break;
-                case 2:
+                case '2':
                     cout << "---Multiple Registrations---" << endl;
                     multiplyRegistration(accs, signup_file, account_file, fail_file, weakpass_file, accbf, wpassbf);
                     cout << "Done." << endl << endl;
                     break;
-                case 3:
+                case '3':
                     cout << "---Login---" << endl;
                     cout << "Enter username: ";
                     getline(cin, acc.username);
@@ -65,11 +65,12 @@ int main()
                     }
                     cout << endl;
                     break;
-                case 4:
+                case '4':
                     menu = false;
                     break;
                 default:
                     cout << "Invalid command!" << endl << endl;
+                    fflush(stdin);
                     break;
             }
         }
