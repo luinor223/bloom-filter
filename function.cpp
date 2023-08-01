@@ -105,7 +105,7 @@ BloomFilter generateWPassFilter(string weakPass_file)
     return bf;
 }
 
-bool registerAccount(Account account, vector<Account> &accs , string account_file, string weakPass_file, BloomFilter accbf, BloomFilter wpassbf)
+bool registerAccount(Account account, vector<Account> &accs , string account_file, string weakPass_file, BloomFilter &accbf, BloomFilter wpassbf)
 {
     // Check username and password constraints
     if (account.username.length() <= 5 || account.username.length() >= 10)
@@ -182,7 +182,7 @@ bool registerAccount(Account account, vector<Account> &accs , string account_fil
     return true;
 }
 
-bool multiplyRegistration(vector<Account> &accs, string signup_file, string account_file, string fail_file, string weakPass_file , BloomFilter accbf, BloomFilter wpassbf)
+bool multiplyRegistration(vector<Account> &accs, string signup_file, string account_file, string fail_file, string weakPass_file , BloomFilter &accbf, BloomFilter wpassbf)
 {
     ifstream ifs(signup_file);
     if (!ifs)
