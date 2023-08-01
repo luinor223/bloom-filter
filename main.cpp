@@ -108,6 +108,7 @@ int main()
                     break;
                 default:
                     cout << "Invalid command!" << endl << endl;
+                    fflush(stdin);
                     break;
             }
         }
