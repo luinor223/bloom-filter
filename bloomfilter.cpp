@@ -7,8 +7,8 @@ using namespace std;
 
 const long long MOD = 10e9 + 7;
 
-const int DatabaseSize = 5000; // number of elements to be inserted
-const double P = 0.05;   // Probability of False positivity 
+const int DatabaseSize = 100000; // number of elements to be inserted
+const double P = 0.0005;   // Probability of False positivity 
 const int BitArraySize = -(DatabaseSize * log(P)) / (log(2) * log(2));
 
 
