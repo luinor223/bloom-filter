@@ -50,7 +50,7 @@ int main()
                     cout << "---Login---" << endl;
                     cout << "Enter username: ";
                     getline(cin, acc.username);
-                    cout << "Enter passowrd: ";
+                    cout << "Enter password: ";
                     getline(cin, acc.password);
                     if (logIn(acc, accs, accbf))
                     {
