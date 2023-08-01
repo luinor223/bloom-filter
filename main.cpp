@@ -87,7 +87,7 @@ int main()
             string newpassword;
             switch (choice)
             {
-                case 1:
+                case '1':
                     cout << "Enter your new password: ";
                     getline(cin, newpassword);
                     if (changePassword(acc, accs, newpassword, account_file, weakpass_file, wpassbf))
@@ -96,13 +96,13 @@ int main()
                         cout << "Failed to change password." << endl;
                     cout << endl;
                     break;
-                case 2:
+                case '2':
                     cout << "Logging out..." << endl << endl;
                     loggedIn = false;
                     acc.username = "";
                     acc.password = "";
                     break;
-                case 3:
+                case '3':
                     cout << "Quiting..." << endl;
                     menu = false;
                     break;
