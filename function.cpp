@@ -173,6 +173,9 @@ bool registerAccount(Account account, vector<Account> &accs , string account_fil
     ofs << account.username << " " << account.password << endl;
     ofs.close();
 
+    //Update vector
+    accs.push_back(account);
+
     //Update bloom filter
     addToBF(account.username, accbf);
 
