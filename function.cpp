@@ -242,7 +242,7 @@ bool logIn(Account acc, vector<Account> accs, BloomFilter bf)
         {
             if (accs[i].password == acc.password)
             {
-                cout << "Login sucessfull." << endl;
+                cout << "Login sucessful." << endl;
                 return true;
             }
             else
